@@ -1,0 +1,99 @@
+###################################################################
+
+#                          #######
+#        #  #####  ######  #        #         ##     ####    ####
+#        #    #    #       #        #        #  #   #    #  #
+#        #    #    #####   #####    #       #    #  #        ####
+#        #    #    #       #        #       ######  #  ###       #
+#        #    #    #       #        #       #    #  #    #  #    #
+#######  #    #    ######  #        ######  #    #   ####    ####
+
+#                         By - MrPixxima
+
+###################################################################
+
+Database:
+  IP: localhost
+  Port: 3306
+  Database: liteflags
+  Username: root
+  Password: root
+  Drivers: mysql
+
+#Flag Configuration
+
+# The amount of active flags a player can have at once.
+ActiveFlags:
+  Limit: 5
+
+  # It will show the last 5 flags a player has when the command /flag list <player>
+  # 0 will set it to show all flags.
+FlagsHistory:
+  ListLimit: 10
+
+#Authentication Configuration
+
+# This will enable a random time set for a player after they authenticate.
+# It will set a random number between a min and max number set in the configuration.
+RandomReauth:
+
+  # This will set the reuth time in (Minutes, Hours, Days)
+  TimeFormat: Days
+
+  # It will choose a random number from these 2 numbers and it will
+  # set their reauth to that random number and how long with Days, Hour, Minutes above. (Ex: 7 Days)
+  MinNumber: 14
+  MaxNumber: 30
+
+# Commands executed when a player authenticates successfully
+Commands:
+
+  # The permission a player gets for x amount of time.
+  # This command is only executed when RandomReuth is enabled.
+  TempAuthSuccess: "lp user %player% permission settemp %permission% true %expiretime%"
+
+# Configurable Messages
+Messages:
+
+  # Key:
+  # %player% - Returns the given player name
+  # %staff% - Return the given staff member name. (Only works in PlayerFlags list)
+  # %reason% - Returns the reason why a player was flagged
+  # %flagtime% - Returns the time when the flag was applied to the given player
+  # %active% - Displayes the Active and Expired strings depending on if the flags are active/expired.
+  # %expiretime% - Returns when a flag will expire if it is active.
+  # %code% - Returns the code the player needs type to authenticate
+
+
+  # The message it sends to staff when a player has active flags
+  # To disable this set the string to "disablethis"
+  AlertActiveFlags: "&7%player% has &c%totalactflags%&7 active flags!"
+
+  # Flags messages
+  PlayerFlagsHeader: "&7&m------&6 Flags (Limit %limit%) &7&m------"
+
+  PlayerFlagsBody:
+    - "%nl%"
+    - "&7&m----&7 %flagtime% ago &7&m----"
+    - "&8%player% was &eflagged&8 for %flaglength% by &e%staff%"
+    - "&8Reason: &6%reason% %active%"
+
+  # The string for %active% if the flag is active - Leave blank to disable.
+  ActiveFlags: "&f[&aActive&f]"
+
+  # The string for %active% if the flag is expired - Leave blank to disable.
+  ExpiredFlags: "&f[&cExpired&f]"
+
+  NoPermission: "&cYou do not have permission to do that."
+  ActiveFlagsLimit: "&e%player% &7has reached the active flags limit."
+  FlaggedPlayer: "&6* %staff% has flagged %player% for (%flaglength%) - Reason: %reason%"
+
+  # Authenticate messages
+  Authenticate: "&7You need to authenticate! Type &6%code%&7 in chat to authenticate. (CaSe SeNsiTiVe)"
+  Authenticate_Failed: "&7You need to authenticate! Type &6%code%&7 in chat to authenticate. (CaSe SeNsiTiVe)"
+  Authenticate_Success: "&7You have authed! You can now play!"
+
+  # How often should the authenicate message show up on a players screen (In seconds)
+Authenticate_Timer: 10
+  # The command that broadcast the authenticate message on a players screen.
+Authenticate_Timer_Command: "tm message %player% You need to authenticate! Type %code% in chat to authenticate. (CaSe SeNsiTiVe)"

@@ -1,0 +1,9 @@
+name: LiteFlags
+main: com.liteflags.LiteFlags
+version: 0.5
+commands:
+  flag:
+    description: Flags a player!
+  flaglist:
+    description: Shows players flags!
+    aliases: fl
