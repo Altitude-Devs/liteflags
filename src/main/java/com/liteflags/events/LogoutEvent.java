@@ -10,27 +10,26 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 public class LogoutEvent implements Listener {
-   private LiteFlags flags;
+    private LiteFlags flags;
 
-   public LogoutEvent(LiteFlags flags) {
-      this.flags = flags;
-   }
+    public LogoutEvent(LiteFlags flags) {
+        this.flags = flags;
+    }
 
-   @EventHandler
-   public void onPlayerLogout(PlayerQuitEvent e) {
-      Player player = e.getPlayer();
-      if (AuthTimer.taskID.containsKey(player.getUniqueId())) {
-         AuthTimer.endTask(player);
-      }
+    @EventHandler
+    public void onPlayerLogout(PlayerQuitEvent e) {
+        Player player = e.getPlayer();
 
-      if (MapCache.reauthedPlayers.containsKey(player.getUniqueId().toString())) {
-         Database.addPlayerCache(player.getUniqueId(), player.getName());
-         MapCache.reauthedPlayers.remove(player.getUniqueId().toString());
-      }
+        if (AuthTimer.taskID.containsKey(player.getUniqueId())) {
+            AuthTimer.endTask(player);
+        }
 
-      if (MapCache.activeFlags.contains(player.getName())) {
-         MapCache.activeFlags.remove(player.getName());
-      }
+        if (MapCache.reauthedPlayers.containsKey(player.getUniqueId().toString())) {
+            Database.addPlayerCache(player.getUniqueId(), player.getName());
+            MapCache.reauthedPlayers.remove(player.getUniqueId().toString());
+        }
 
-   }
+        MapCache.activeFlags.remove(player.getName());
+
+    }
 }

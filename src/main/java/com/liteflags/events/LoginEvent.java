@@ -5,7 +5,7 @@ import com.liteflags.auth.Authentication;
 import com.liteflags.data.database.Methods;
 import com.liteflags.data.maps.MapCache;
 import com.liteflags.util.Utilities;
-import java.util.Iterator;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -13,31 +13,25 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 public class LoginEvent implements Listener {
-   private LiteFlags flags;
 
-   public LoginEvent(LiteFlags flags) {
-      this.flags = flags;
-   }
+    @EventHandler
+    public void onPlayerLogin(PlayerJoinEvent e) {
+        Player player = e.getPlayer();
+        if (!player.hasPermission("liteflags.authentication.bypass")) {
+            Authentication.checkAuthStatus(player.getUniqueId());
+        }
 
-   @EventHandler
-   public void onPlayerLogin(PlayerJoinEvent e) {
-      Player player = e.getPlayer();
-      if (!player.hasPermission("liteflags.authentication.bypass")) {
-         Authentication.checkAuthStatus(player.getUniqueId());
-      }
+        if (!Methods.hasActiveFlags(player)) {
+            return;
+        }
 
-      if (Methods.hasActiveFlags(player)) {
-         MapCache.activeFlags.add(player.getName());
-         Iterator var3 = Bukkit.getOnlinePlayers().iterator();
+        MapCache.activeFlags.add(player.getName());
 
-         while(var3.hasNext()) {
-            Player staff = (Player)var3.next();
-            if (staff.hasPermission("liteflags.alertflags") && !LiteFlags.getInstance().getConfig().getString("Messages.AlertActiveFlags").equalsIgnoreCase("disablethis")) {
-               int activeTotalFlags = Methods.getTotalActiveFlags(player);
-               Utilities.sendStaffHoverMessage(player, staff, Utilities.format(LiteFlags.getInstance().getConfig().getString("Messages.AlertActiveFlags").replace("%player%", player.getName()).replace("%totalactflags%", "" + activeTotalFlags).replace("%consoleFlags%", "" + Methods.consoleFlags).replace("%staffFlags%", "" + Methods.staffFlags)));
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            if (onlinePlayer.hasPermission("liteflags.alertflags") && !LiteFlags.getInstance().getConfig().getString("Messages.AlertActiveFlags").equalsIgnoreCase("disablethis")) {
+                int activeTotalFlags = Methods.getTotalActiveFlags(player);
+                Utilities.sendStaffHoverMessage(player, onlinePlayer, Utilities.format(LiteFlags.getInstance().getConfig().getString("Messages.AlertActiveFlags").replace("%player%", player.getName()).replace("%totalactflags%", "" + activeTotalFlags).replace("%consoleFlags%", "" + Methods.consoleFlags).replace("%staffFlags%", "" + Methods.staffFlags)));
             }
-         }
-      }
-
-   }
+        }
+    }
 }

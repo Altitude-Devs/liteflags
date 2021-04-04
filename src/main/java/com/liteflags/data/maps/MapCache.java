@@ -6,6 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 public class MapCache {
-   public static Map<String, String> reauthedPlayers = new HashMap();
-   public static List<String> activeFlags = new ArrayList();
+    public static Map<String, String> reauthedPlayers = new HashMap();
+    public static List<String> activeFlags = new ArrayList();
 }
