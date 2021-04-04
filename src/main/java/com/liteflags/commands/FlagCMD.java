@@ -207,7 +207,7 @@ public class FlagCMD implements CommandExecutor {
    public void sendFlagMessage(CommandSender sender, OfflinePlayer targetPlayer) {
       List<String> body = LiteFlags.getInstance().getConfig().getStringList("Messages.PlayerFlagsBody");
       int i = 0;
-      int id = false;
+      //int id = false;
       boolean headerMessage = false;
       if (Database.hasFlags(targetPlayer.getUniqueId())) {
          try {

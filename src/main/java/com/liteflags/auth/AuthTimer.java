@@ -44,7 +44,7 @@ public class AuthTimer<taskID> {
 
    public static void endTask(Player player) {
       if (taskID.containsKey(player.getUniqueId())) {
-         int tid = (Integer)taskID.get(player.getUniqueId());
+         int tid = taskID.get(player.getUniqueId());
          LiteFlags.getInstance().getServer().getScheduler().cancelTask(tid);
          taskID.remove(player.getUniqueId());
       }

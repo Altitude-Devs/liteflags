@@ -13,9 +13,9 @@ import org.bukkit.entity.Player;
 
 public class Utilities {
    public static String convertTime(int time) {
-      int days = (int)TimeUnit.MINUTES.toDays((long)time);
-      int hours = (int)(TimeUnit.MINUTES.toHours((long)time) - TimeUnit.DAYS.toHours((long)days));
-      int minutes = (int)(TimeUnit.MINUTES.toMinutes((long)time) - TimeUnit.HOURS.toMinutes((long)hours) - TimeUnit.DAYS.toMinutes((long)days));
+      int days = (int) TimeUnit.MINUTES.toDays(time);
+      int hours = (int)(TimeUnit.MINUTES.toHours(time) - TimeUnit.DAYS.toHours(days));
+      int minutes = (int)(TimeUnit.MINUTES.toMinutes(time) - TimeUnit.HOURS.toMinutes(hours) - TimeUnit.DAYS.toMinutes(days));
       String d = days + " day";
       String h = hours + " hour";
       String m = minutes + " minute";

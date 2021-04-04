@@ -25,7 +25,7 @@ public class ChatEvent implements Listener {
    public void onPlayerChat(AsyncPlayerChatEvent e) {
       final Player player = e.getPlayer();
       if (MapCache.reauthedPlayers.containsKey(player.getUniqueId().toString())) {
-         String value = (String)MapCache.reauthedPlayers.get(player.getUniqueId().toString());
+         String value = MapCache.reauthedPlayers.get(player.getUniqueId().toString());
          if (e.getMessage().equals(value)) {
             e.setCancelled(true);
             player.sendMessage(Utilities.format(LiteFlags.getInstance().getConfig().getString("Messages.Authenticate_Success")));
