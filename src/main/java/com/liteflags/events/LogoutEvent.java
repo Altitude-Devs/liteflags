@@ -10,11 +10,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 public class LogoutEvent implements Listener {
-    private LiteFlags flags;
-
-    public LogoutEvent(LiteFlags flags) {
-        this.flags = flags;
-    }
 
     @EventHandler
     public void onPlayerLogout(PlayerQuitEvent e) {

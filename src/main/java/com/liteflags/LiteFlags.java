@@ -18,12 +18,12 @@ public class LiteFlags extends JavaPlugin {
    public void onEnable() {
       instance = this;
       this.saveDefaultConfig();
-      this.getCommand("flag").setExecutor(new FlagCMD(this));
-      this.getCommand("flaglist").setExecutor(new FlagCMD(this));
-      this.getServer().getPluginManager().registerEvents(new LoginEvent(this), this);
-      this.getServer().getPluginManager().registerEvents(new LogoutEvent(this), this);
-      this.getServer().getPluginManager().registerEvents(new ChatEvent(this), this);
-      this.getServer().getPluginManager().registerEvents(new MoveEvent(this), this);
+      this.getCommand("flag").setExecutor(new FlagCMD());
+      this.getCommand("flaglist").setExecutor(new FlagCMD());
+      this.getServer().getPluginManager().registerEvents(new LoginEvent(), this);
+      this.getServer().getPluginManager().registerEvents(new LogoutEvent(), this);
+      this.getServer().getPluginManager().registerEvents(new ChatEvent(), this);
+      this.getServer().getPluginManager().registerEvents(new MoveEvent(), this);
 
       try {
          DatabaseConnection var10000 = this.database;

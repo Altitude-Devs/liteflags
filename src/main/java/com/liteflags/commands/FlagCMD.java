@@ -27,11 +27,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class FlagCMD implements CommandExecutor {
-    private LiteFlags flags;
-
-    public FlagCMD(LiteFlags flags) {
-        this.flags = flags;
-    }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         OfflinePlayer target;
@@ -234,22 +229,22 @@ public class FlagCMD implements CommandExecutor {
                             }
 
                             String s = (String) var20.next();
-                            s = s.replaceFirst("%player%", targetPlayer.getName());
-                            s = s.replaceFirst("%staff%", flaggedBy);
-                            s = s.replaceFirst("%flaglength%", flagLength);
-                            s = s.replaceFirst("%reason%", reason);
-                            s = s.replaceFirst("%flagtime%", Utilities.convertTime(convertedFlaggedTime));
+                            s = s.replace("%player%", targetPlayer.getName());
+                            s = s.replace("%staff%", flaggedBy);
+                            s = s.replace("%flaglength%", flagLength);
+                            s = s.replace("%reason%", reason);
+                            s = s.replace("%flagtime%", Utilities.convertTime(convertedFlaggedTime));
                             if (expireTime != 0L) {
-                                s = s.replaceFirst("%expiretime%", Utilities.convertTime(convertedExpireTime));
+                                s = s.replace("%expiretime%", Utilities.convertTime(convertedExpireTime));
                             }
 
-                            s = s.replaceFirst("%limit%", "" + Database.countFlags(targetPlayer.getUniqueId()));
-                            s = s.replaceFirst("%nl%", " ");
+                            s = s.replace("%limit%", "" + Database.countFlags(targetPlayer.getUniqueId()));
+                            s = s.replace("%nl%", " ");
                             if (convertedExpireTime < 0 && expireTime != 0L) {
-                                s = s.replaceFirst("%active%", LiteFlags.getInstance().getConfig().getString("Messages.ExpiredFlags"));
+                                s = s.replace("%active%", LiteFlags.getInstance().getConfig().getString("Messages.ExpiredFlags"));
                                 mainComponent = new TextComponent(Utilities.format(s));
                             } else {
-                                s = s.replaceFirst("%active%", LiteFlags.getInstance().getConfig().getString("Messages.ActiveFlags"));
+                                s = s.replace("%active%", LiteFlags.getInstance().getConfig().getString("Messages.ActiveFlags"));
                                 mainComponent = new TextComponent(Utilities.format(s));
                             }
 
