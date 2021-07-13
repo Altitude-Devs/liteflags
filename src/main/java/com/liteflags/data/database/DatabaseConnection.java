@@ -26,7 +26,7 @@ public class DatabaseConnection {
         if (this.connection == null || this.connection.isClosed()) {
             synchronized (this) {
                 if (this.connection == null || this.connection.isClosed()) {
-                    this.connection = DriverManager.getConnection("jdbc:" + this.drivers + "://" + this.ip + ":" + this.port + "/" + this.database, this.username, this.password);
+                    this.connection = DriverManager.getConnection("jdbc:" + this.drivers + "://" + this.ip + ":" + this.port + "/" + this.database + "?autoReconnect=true&useSSL=false", this.username, this.password);
                 }
             }
         }
