@@ -10,6 +10,7 @@ public class MoveEvent implements Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent e) {
         Player player = e.getPlayer();
-        e.setCancelled(MapCache.reauthedPlayers.containsKey(player.getUniqueId().toString()));
+        if (MapCache.reauthedPlayers.containsKey(player.getUniqueId().toString()))
+            e.setCancelled(true);
     }
 }

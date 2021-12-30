@@ -1,6 +1,6 @@
 package com.liteflags.data.database;
 
-import com.liteflags.LiteFlags;
+import com.liteflags.config.Config;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -29,84 +29,33 @@ public class Database {
 
         try {
             PreparedStatement statement = DatabaseConnection.getConnection().prepareStatement(sql);
-            Throwable var9 = null;
 
-            try {
-                statement.setString(1, uuid.toString());
-                statement.setLong(2, expireTime);
-                statement.setString(3, reason);
-                statement.setString(4, flaggedBy);
-                statement.setInt(5, timeFlagged);
-                statement.setString(6, flagLength);
-                statement.execute();
-            } catch (Throwable var19) {
-                var9 = var19;
-                throw var19;
-            } finally {
-                if (statement != null) {
-                    if (var9 != null) {
-                        try {
-                            statement.close();
-                        } catch (Throwable var18) {
-                            var9.addSuppressed(var18);
-                        }
-                    } else {
-                        statement.close();
-                    }
-                }
-
-            }
+            statement.setString(1, uuid.toString());
+            statement.setLong(2, expireTime);
+            statement.setString(3, reason);
+            statement.setString(4, flaggedBy);
+            statement.setInt(5, timeFlagged);
+            statement.setString(6, flagLength);
+            statement.execute();
         } catch (SQLException var21) {
             var21.printStackTrace();
         }
 
     }
 
-    public static void removeFlag(UUID uuid, int id) {
+    public static boolean removeFlag(UUID uuid, int id) {
         String sql = "DELETE FROM player_flags WHERE uuid = ? AND id = ?";
 
         try {
             PreparedStatement statement = DatabaseConnection.getConnection().prepareStatement(sql);
-            Throwable var4 = null;
-
-            try {
-                statement.setString(1, uuid.toString());
-                statement.setInt(2, id);
-                statement.executeUpdate();
-            } catch (Throwable var14) {
-                var4 = var14;
-                throw var14;
-            } finally {
-                if (statement != null) {
-                    if (var4 != null) {
-                        try {
-                            statement.close();
-                        } catch (Throwable var13) {
-                            var4.addSuppressed(var13);
-                        }
-                    } else {
-                        statement.close();
-                    }
-                }
-
-            }
+            statement.setString(1, uuid.toString());
+            statement.setInt(2, id);
+            if (statement.executeUpdate() > 0)
+                return true;
         } catch (SQLException var16) {
             var16.printStackTrace();
         }
-
-    }
-
-    public static Integer countFlags(UUID uuid) {
-        int i = 0;
-
-        try {
-            for (ResultSet resultSet = getPlayerFlags(uuid); resultSet.next(); ++i) {
-            }
-        } catch (SQLException var3) {
-            var3.printStackTrace();
-        }
-
-        return i;
+        return false;
     }
 
     public static void removePlayerCache(UUID uuid) {
@@ -141,48 +90,29 @@ public class Database {
         }
 
     }
-
-    public static boolean hasFlags(UUID u) {
-        try {
-            if (getStringResult("SELECT * FROM player_flags WHERE uuid = ?", u.toString()).next()) {
-                return true;
-            }
-        } catch (SQLException var2) {
-            var2.printStackTrace();
-        }
-
-        return false;
-    }
+//
+//    public static boolean hasFlag(UUID uuid, int id) {
+//        try {
+//            if (getStringResult("SELECT * FROM player_flags WHERE uuid = ?", uuid.toString()).next()) {
+//                return true;
+//            }
+//        } catch (SQLException var2) {
+//            var2.printStackTrace();
+//        }
+//
+//        return false;
+//    }
 
     public static void addPlayerCache(UUID uuid, String playerName) {
         String sql = "INSERT INTO player_cache (uuid, player_name) VALUES (?, ?) ON DUPLICATE KEY UPDATE player_name = ?";
 
         try {
             PreparedStatement statement = DatabaseConnection.getConnection().prepareStatement(sql);
-            Throwable var4 = null;
 
-            try {
-                statement.setString(1, uuid.toString());
-                statement.setString(2, playerName);
-                statement.setString(3, playerName);
-                statement.execute();
-            } catch (Throwable var14) {
-                var4 = var14;
-                throw var14;
-            } finally {
-                if (statement != null) {
-                    if (var4 != null) {
-                        try {
-                            statement.close();
-                        } catch (Throwable var13) {
-                            var4.addSuppressed(var13);
-                        }
-                    } else {
-                        statement.close();
-                    }
-                }
-
-            }
+            statement.setString(1, uuid.toString());
+            statement.setString(2, playerName);
+            statement.setString(3, playerName);
+            statement.execute();
         } catch (SQLException var16) {
             var16.printStackTrace();
         }
@@ -215,7 +145,7 @@ public class Database {
     }
 
     public static ResultSet getPlayerFlags(UUID uuid) throws SQLException {
-        return getStringResult("SELECT * FROM player_flags WHERE uuid = ? ORDER BY id DESC LIMIT " + LiteFlags.getInstance().getConfig().getInt("FlagsHistory.ListLimit"), uuid.toString());
+        return getStringResult("SELECT player_flags.*, count(*)over() AS total_flags FROM player_flags WHERE uuid = ? ORDER BY id DESC LIMIT " + Config.MAX_FLAGS_LISTED, uuid.toString());
     }
 
     public static ResultSet getActiveTime(UUID uuid) throws SQLException {

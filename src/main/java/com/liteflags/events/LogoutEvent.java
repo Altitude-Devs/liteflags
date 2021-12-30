@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class LogoutEvent implements Listener {
 
@@ -20,7 +21,12 @@ public class LogoutEvent implements Listener {
         }
 
         if (MapCache.reauthedPlayers.containsKey(player.getUniqueId().toString())) {
-            Database.addPlayerCache(player.getUniqueId(), player.getName());
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    Database.addPlayerCache(player.getUniqueId(), player.getName());
+                }
+            }.runTask(LiteFlags.getInstance());
             MapCache.reauthedPlayers.remove(player.getUniqueId().toString());
         }
 

@@ -1,20 +1,22 @@
 package com.liteflags.events;
 
 import com.liteflags.LiteFlags;
+import com.liteflags.config.Config;
 import com.liteflags.data.database.Database;
 import com.liteflags.data.database.Methods;
 import com.liteflags.data.maps.MapCache;
+import com.liteflags.util.Logger;
 import com.liteflags.util.Utilities;
-
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
-
+import net.kyori.adventure.text.minimessage.Template;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class ChatEvent implements Listener {
 
@@ -31,40 +33,45 @@ public class ChatEvent implements Listener {
         if (e.getMessage().equals(value)) {
             e.setCancelled(true);
 
-            player.sendMessage(Utilities.format(LiteFlags.getInstance().getConfig().getString("Messages.Authenticate_Success")));
+            player.sendMiniMessage(Config.AUTHENTICATE_SUCCESS, null);
 
-            final int min = LiteFlags.getInstance().getConfig().getInt("RandomReauth.MinNumber");
-            final int max = LiteFlags.getInstance().getConfig().getInt("RandomReauth.MaxNumber");
+            final int min = Config.MIN_RANDOM_RE_AUTH;
+            final int max = Config.MAX_RANDOM_RE_AUTH;
 
-            final String timeAmount = LiteFlags.getInstance().getConfig().getString("RandomReauth.TimeFormat");
+            final String timeAmount = Config.TIME_FORMAT;
 
             new BukkitRunnable() {
                 public void run() {
                     Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-                            LiteFlags.getInstance().getConfig().getString("Commands.TempAuthSuccess")
-                                    .replace("%player%", player.getName())
-                                    .replace("%permission%", "liteflags.authentication.success")
-                                    .replace("%expiretime%",
-                                            Methods.getRandomIntegerBetweenRange(min, max)
+                            Config.AUTH_SUCCESS_COMMAND
+                                    .replaceAll("<player>", player.getName())
+                                    .replaceAll("<permission>", "liteflags.authentication.success")
+                                    .replaceAll("<expiretime>", Methods.getRandomIntegerBetweenRange(min, max)
                                                     + timeAmount.substring(0, 1).toLowerCase()));
                 }
             }.runTask(LiteFlags.getInstance());
 
             MapCache.reauthedPlayers.remove(player.getUniqueId().toString());
 
-            if (Database.inPlayerCache(player.getUniqueId())) {
-                long currentTime = TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis());
-                int expireTime = 10080;
-                int conTime = (int) currentTime + expireTime;
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (Database.inPlayerCache(player.getUniqueId())) {
+                        long currentTime = TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis());
+                        int expireTime = 10080;
+                        int conTime = (int) currentTime + expireTime;
 
-                Database.addFlag(player.getUniqueId(), (long) ((int) TimeUnit.MINUTES.toSeconds((long) conTime)), "Possible Hacked Client - Logged out before authenticating.", "Console", "7 Days");
-                Database.removePlayerCache(player.getUniqueId());
-            }
+                        Database.addFlag(player.getUniqueId(), (int) TimeUnit.MINUTES.toSeconds(conTime), "Possible Hacked Client - Logged out before authenticating.", "Console", "7 Days");
+                        Database.removePlayerCache(player.getUniqueId());
+                    }
+                }
+            }.runTask(LiteFlags.getInstance());
 
         } else {
             e.setCancelled(true);
-            player.sendMessage(Utilities.format(LiteFlags.getInstance().getConfig().getString("Messages.Authenticate_Failed").replace("%code%", (CharSequence) MapCache.reauthedPlayers.get(player.getUniqueId().toString()))));
-            LiteFlags.getInstance().getLogger().info(player.getName() + " tried talking while authenticating: " + e.getMessage());
+            player.sendMiniMessage(Config.AUTHENTICATE_FAILED, List.of(
+                    Template.template("code", MapCache.reauthedPlayers.get(player.getUniqueId().toString()))));
+            Logger.info(player.getName() + " tried talking while authenticating: " + e.getMessage());
         }
     }
 }

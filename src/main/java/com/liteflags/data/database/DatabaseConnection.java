@@ -1,6 +1,6 @@
 package com.liteflags.data.database;
 
-import com.liteflags.LiteFlags;
+import com.liteflags.config.Config;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -9,12 +9,12 @@ import java.sql.SQLException;
 public class DatabaseConnection {
     public static DatabaseConnection instance;
     public Connection connection;
-    public String drivers = LiteFlags.getInstance().getConfig().getString("Database.Drivers");
-    public String ip = LiteFlags.getInstance().getConfig().getString("Database.IP");
-    public String port = LiteFlags.getInstance().getConfig().getString("Database.Port");
-    public String database = LiteFlags.getInstance().getConfig().getString("Database.Database");
-    public String username = LiteFlags.getInstance().getConfig().getString("Database.Username");
-    public String password = LiteFlags.getInstance().getConfig().getString("Database.Password");
+    public String drivers = Config.DRIVERS;
+    public String ip = Config.IP;
+    public String port = Config.PORT;
+    public String database = Config.DATABASE;
+    public String username = Config.USERNAME;
+    public String password = Config.PASSWORD;
 
     public DatabaseConnection() throws SQLException {
         instance = this;

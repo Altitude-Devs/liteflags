@@ -1,36 +1,44 @@
 package com.liteflags.auth;
 
 import com.liteflags.LiteFlags;
+import com.liteflags.config.Config;
 import com.liteflags.data.maps.MapCache;
 import com.liteflags.util.Utilities;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import net.kyori.adventure.text.minimessage.Template;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class AuthTimer<taskID> {
     public LiteFlags flags;
-    public static Map<UUID, Integer> taskID = new HashMap();
+    public static Map<UUID, Integer> taskID = new HashMap<>();
 
     public AuthTimer(LiteFlags flags) {
         this.flags = flags;
     }
 
     public static void startTimer(final Player player) {
+        final String uuid = player.getUniqueId().toString();
+
         int tid = LiteFlags.getInstance().getServer().getScheduler().scheduleSyncRepeatingTask(LiteFlags.getInstance(), new Runnable() {
-            int timeRemaining = LiteFlags.getInstance().getConfig().getInt("Authenticate_Timer");
+            int timeRemaining = Config.AUTH_MESSAGE_REPEAT_TIMER;
 
             public void run() {
                 if (this.timeRemaining <= 0) {
                     if (player.hasPermission("liteflags.authentication.success")) {
                         AuthTimer.endTask(player);
                     } else {
-                        player.sendMessage(Utilities.format(LiteFlags.getInstance().getConfig().getString("Messages.Authenticate").replace("%code%", (CharSequence) MapCache.reauthedPlayers.get(player.getUniqueId().toString()))));
-                        Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), LiteFlags.getInstance().getConfig().getString("Authenticate_Timer_Command").replace("%player%", player.getName()).replace("%code%", (CharSequence) MapCache.reauthedPlayers.get(player.getUniqueId().toString())));
-                        this.timeRemaining = LiteFlags.getInstance().getConfig().getInt("Authenticate_Timer");
+                        player.sendMiniMessage(Config.AUTHENTICATE, List.of(
+                                Template.template("code", MapCache.reauthedPlayers.get(uuid))));
+                        Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Config.AUTH_MESSAGE_COMMAND
+                                .replaceAll("<player>", player.getName())
+                                .replaceAll("<code>", MapCache.reauthedPlayers.get(uuid)));
+                        this.timeRemaining = Config.AUTH_MESSAGE_REPEAT_TIMER;
                     }
                 } else if (player.hasPermission("liteflags.authentication.success")) {
                     AuthTimer.endTask(player);
@@ -40,7 +48,9 @@ public class AuthTimer<taskID> {
 
             }
         }, 0L, 20L);
-        Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), LiteFlags.getInstance().getConfig().getString("Authenticate_Timer_Command").replace("%player%", player.getName()).replace("%code%", (CharSequence) MapCache.reauthedPlayers.get(player.getUniqueId().toString())));
+        Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Config.AUTH_MESSAGE_COMMAND
+                .replaceAll("<player>", player.getName())
+                .replaceAll("<code>", MapCache.reauthedPlayers.get(uuid)));
         taskID.put(player.getUniqueId(), tid);
     }
 

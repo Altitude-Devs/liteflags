@@ -1,26 +1,21 @@
 package com.liteflags.data.database;
 
-import com.liteflags.LiteFlags;
-import com.liteflags.util.Utilities;
+import org.bukkit.OfflinePlayer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.TimeUnit;
 
-import org.bukkit.OfflinePlayer;
-
 public class Methods {
     public static int consoleFlags;
     public static int staffFlags;
-    public static String flagListLimit = LiteFlags.getInstance().getConfig().getString("ActiveFlags.Limit");
-    public static String playerFlagsHeader;
 
     public static boolean hasActiveFlags(OfflinePlayer player) {
         try {
             ResultSet flag = Database.getActiveTime(player.getUniqueId());
 
             while (flag.next()) {
-                long expireTime = TimeUnit.SECONDS.toMinutes((long) flag.getInt("expire_time"));
+                long expireTime = TimeUnit.SECONDS.toMinutes(flag.getInt("expire_time"));
                 long currentTime = TimeUnit.SECONDS.toMinutes(System.currentTimeMillis() / 1000L);
                 int convertedExpireTime = (int) expireTime - (int) currentTime;
 
@@ -90,12 +85,6 @@ public class Methods {
     }
 
     public static int getRandomIntegerBetweenRange(int min, int max) {
-        int x = (int) (Math.random() * (double) (max - min + 1)) + min;
-        return x;
-    }
-
-    static {
-        playerFlagsHeader = Utilities.format(LiteFlags.getInstance().getConfig().getString("Messages.PlayerFlagsHeader")
-                .replace("%limit%", flagListLimit));
+        return (int) (Math.random() * (double) (max - min + 1)) + min;
     }
 }

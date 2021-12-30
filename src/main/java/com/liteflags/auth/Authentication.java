@@ -1,14 +1,13 @@
 package com.liteflags.auth;
 
-import com.liteflags.LiteFlags;
 import com.liteflags.data.maps.MapCache;
+import com.liteflags.config.Config;
 import com.liteflags.util.Utilities;
-
-import java.util.Random;
-import java.util.UUID;
-
-import org.bukkit.Bukkit;
+import net.kyori.adventure.text.minimessage.Template;
 import org.bukkit.entity.Player;
+
+import java.util.List;
+import java.util.Random;
 
 public class Authentication {
     public static String getAuthKey() {
@@ -21,16 +20,17 @@ public class Authentication {
             salt.append(randChars.charAt(index));
         }
 
-        return "." + salt.toString();
+        return "." + salt;
     }
 
-    public static void checkAuthStatus(UUID uuid) {
-        Player player = Bukkit.getPlayer(uuid);
-        if (!player.hasPermission("liteflags.authentication.success")) {
-            MapCache.reauthedPlayers.put(player.getUniqueId().toString(), getAuthKey());
-            AuthTimer.startTimer(player);
-            player.sendMessage(Utilities.format(LiteFlags.getInstance().getConfig().getString("Messages.Authenticate").replace("%code%", (CharSequence) MapCache.reauthedPlayers.get(player.getUniqueId().toString()))));
-        }
+    public static void checkAuthStatus(Player player) {
+        if (player.hasPermission("liteflags.authentication.success"))
+            return;
+
+        MapCache.reauthedPlayers.put(player.getUniqueId().toString(), getAuthKey());
+        AuthTimer.startTimer(player);
+        player.sendMiniMessage(Config.AUTHENTICATE,
+                List.of(Template.template("code", MapCache.reauthedPlayers.get(player.getUniqueId().toString()))));
 
     }
 }
