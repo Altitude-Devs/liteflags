@@ -66,9 +66,8 @@ public class CommandFlagList extends SubCommand {
                     sendFlagMessage(commandSender, player, body);
                 }
             }.runTask(LiteFlags.getInstance());
-        } else {
-            //TODO return error
-        }
+        } else
+            commandSender.sendMiniMessage(getHelpMessage(), null);
         return true;
     }
 
@@ -142,7 +141,7 @@ public class CommandFlagList extends SubCommand {
                 message = message.append(miniMessage.deserialize(str, TemplateResolver.templates(templates)));
             }
             if (message == null) {
-                commandSender.sendMiniMessage(Config.NO_FLAG_FOUND, null);
+                commandSender.sendMiniMessage(Config.NO_FLAGS_FOUND, List.of(Template.template("target", targetName)));
             } else
                 commandSender.sendMessage(message);
         } catch (SQLException exception) {
