@@ -1,6 +1,7 @@
 name: LiteFlags
 main: com.liteflags.LiteFlags
 version: 0.5
+api-version: 1.18
 commands:
   flag:
     description: Base command for the LiteFlags plugin!
