@@ -15,18 +15,21 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 public class CommandFlagPlayer extends SubCommand {
     @Override
     public boolean onCommand(CommandSender commandSender, String[] args) {
+        if (args.length < 2) {
+            commandSender.sendMiniMessage(getHelpMessage(), null);
+            return true;
+        }
+
         OfflinePlayer target = Bukkit.getServer().getOfflinePlayerIfCached(args[0]);
         if (target == null) {
             commandSender.sendMiniMessage(Config.UNKNOWN_PLAYER, List.of(Template.template("player", args[2])));
