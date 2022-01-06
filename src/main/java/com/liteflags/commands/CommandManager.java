@@ -76,11 +76,11 @@ public class CommandManager implements CommandExecutor, TabExecutor {
                     .filter(subCommand -> commandSender.hasPermission(subCommand.getPermission()))
                     .map(SubCommand::getName)
                     .filter(Objects::nonNull)
-                    .filter(name -> args.length == 0 || name.startsWith(args[0]))
+                    .filter(name -> args.length == 0 || name.startsWith(args[0].toLowerCase()))
                     .collect(Collectors.toList()));
             res.addAll(Bukkit.getOnlinePlayers().stream()
                     .map(Player::getName)
-                    .filter(name -> args.length == 0 || name.startsWith(args[0]))
+                    .filter(name -> args.length == 0 || name.startsWith(args[0].toLowerCase()))
                     .collect(Collectors.toList()));
         } else {
             SubCommand subCommand = getSubCommand(args[0]);
