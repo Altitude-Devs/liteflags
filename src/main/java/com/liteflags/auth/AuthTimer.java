@@ -33,11 +33,14 @@ public class AuthTimer<taskID> {
                     if (player.hasPermission("liteflags.authentication.success")) {
                         AuthTimer.endTask(player);
                     } else {
+                        final String code = MapCache.reauthedPlayers.get(uuid);
+                        if (code == null)
+                            return;
                         player.sendMiniMessage(Config.AUTHENTICATE, List.of(
-                                Template.template("code", MapCache.reauthedPlayers.get(uuid))));
+                                Template.template("code", code)));
                         Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Config.AUTH_MESSAGE_COMMAND
                                 .replaceAll("<player>", player.getName())
-                                .replaceAll("<code>", MapCache.reauthedPlayers.get(uuid)));
+                                .replaceAll("<code>", code));
                         this.timeRemaining = Config.AUTH_MESSAGE_REPEAT_TIMER;
                     }
                 } else if (player.hasPermission("liteflags.authentication.success")) {
