@@ -57,7 +57,7 @@ public class CommandFlagPlayer extends SubCommand {
             return;
         }
 
-        String reason = String.join(" ", Arrays.copyOfRange(args, 3, args.length));
+        String reason = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
 
         new BukkitRunnable() {
             @Override
