@@ -7,8 +7,8 @@ import com.liteflags.data.database.Methods;
 import com.liteflags.data.maps.MapCache;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.Template;
-import net.kyori.adventure.text.minimessage.template.TemplateResolver;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -36,11 +36,11 @@ public class LoginEvent implements Listener {
 
                 MapCache.activeFlags.add(player.getName());
 
-                Component message = MiniMessage.miniMessage().deserialize(Config.ALERT_ACTIVE_FLAGS, TemplateResolver.templates(List.of(
-                        Template.template("player", player.getName()),
-                        Template.template("total_act_flags", String.valueOf(Methods.getTotalActiveFlags(player))),
-                        Template.template("console_flags", String.valueOf(Methods.consoleFlags)),
-                        Template.template("staff_flags", String.valueOf(Methods.staffFlags))
+                Component message = MiniMessage.miniMessage().deserialize(Config.ALERT_ACTIVE_FLAGS, TagResolver.resolver(List.of(
+                        Placeholder.unparsed("player", player.getName()),
+                        Placeholder.unparsed("total_act_flags", String.valueOf(Methods.getTotalActiveFlags(player))),
+                        Placeholder.unparsed("console_flags", String.valueOf(Methods.consoleFlags)),
+                        Placeholder.unparsed("staff_flags", String.valueOf(Methods.staffFlags))
                 )));
 
                 Bukkit.getOnlinePlayers().stream()

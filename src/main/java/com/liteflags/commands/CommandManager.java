@@ -4,8 +4,6 @@ import com.liteflags.LiteFlags;
 import com.liteflags.commands.subcommands.*;
 import com.liteflags.config.Config;
 import com.liteflags.util.Logger;
-import com.liteflags.util.Utilities;
-import net.kyori.adventure.text.minimessage.Template;
 import org.bukkit.Bukkit;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;

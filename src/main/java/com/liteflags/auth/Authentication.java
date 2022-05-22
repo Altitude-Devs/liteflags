@@ -2,8 +2,8 @@ package com.liteflags.auth;
 
 import com.liteflags.data.maps.MapCache;
 import com.liteflags.config.Config;
-import com.liteflags.util.Utilities;
-import net.kyori.adventure.text.minimessage.Template;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -30,7 +30,7 @@ public class Authentication {
         MapCache.reauthedPlayers.put(player.getUniqueId().toString(), getAuthKey());
         AuthTimer.startTimer(player);
         player.sendMiniMessage(Config.AUTHENTICATE,
-                List.of(Template.template("code", MapCache.reauthedPlayers.get(player.getUniqueId().toString()))));
+                TagResolver.resolver(Placeholder.unparsed("code", MapCache.reauthedPlayers.get(player.getUniqueId().toString()))));
 
     }
 }

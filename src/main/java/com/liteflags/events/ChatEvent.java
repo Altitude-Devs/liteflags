@@ -6,8 +6,8 @@ import com.liteflags.data.database.Database;
 import com.liteflags.data.database.Methods;
 import com.liteflags.data.maps.MapCache;
 import com.liteflags.util.Logger;
-import com.liteflags.util.Utilities;
-import net.kyori.adventure.text.minimessage.Template;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -69,8 +69,8 @@ public class ChatEvent implements Listener {
 
         } else {
             e.setCancelled(true);
-            player.sendMiniMessage(Config.AUTHENTICATE_FAILED, List.of(
-                    Template.template("code", MapCache.reauthedPlayers.get(player.getUniqueId().toString()))));
+            player.sendMiniMessage(Config.AUTHENTICATE_FAILED, TagResolver.resolver(
+                    Placeholder.unparsed("code", MapCache.reauthedPlayers.get(player.getUniqueId().toString()))));
             Logger.info(player.getName() + " tried talking while authenticating: " + e.getMessage());
         }
     }

@@ -3,8 +3,6 @@ package com.liteflags.commands.subcommands;
 import com.liteflags.commands.CommandManager;
 import com.liteflags.commands.SubCommand;
 import com.liteflags.config.Config;
-import com.liteflags.util.Utilities;
-import net.kyori.adventure.text.minimessage.Template;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;

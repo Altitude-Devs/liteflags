@@ -10,8 +10,8 @@ import com.liteflags.util.Logger;
 import com.liteflags.util.Utilities;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.Template;
-import net.kyori.adventure.text.minimessage.template.TemplateResolver;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -36,11 +36,11 @@ public class CommandFlagList extends SubCommand {
                         Logger.warning("% is not a flagged player", playerName);
                         return;
                     }
-                    commandSender.sendMiniMessage(Config.ALERT_ACTIVE_FLAGS, List.of(
-                            Template.template("player", player.getName() == null ? playerName : player.getName()),
-                            Template.template("total_act_flags", String.valueOf( Methods.getTotalActiveFlags(player))),
-                            Template.template("console_flags", String.valueOf(Methods.consoleFlags)),
-                            Template.template("staff_flags", String.valueOf(Methods.staffFlags))
+                    commandSender.sendMiniMessage(Config.ALERT_ACTIVE_FLAGS, TagResolver.resolver(
+                            Placeholder.unparsed("player", player.getName() == null ? playerName : player.getName()),
+                            Placeholder.unparsed("total_act_flags", String.valueOf( Methods.getTotalActiveFlags(player))),
+                            Placeholder.unparsed("console_flags", String.valueOf(Methods.consoleFlags)),
+                            Placeholder.unparsed("staff_flags", String.valueOf(Methods.staffFlags))
                     ));
                 });
             } else
@@ -57,7 +57,7 @@ public class CommandFlagList extends SubCommand {
                 body = Config.PLAYER_FLAG_LIST_SHORT;
             OfflinePlayer player = Bukkit.getServer().getOfflinePlayerIfCached(args[1]);
             if (player == null) {
-                commandSender.sendMiniMessage(Config.UNKNOWN_PLAYER, List.of(Template.template("player", args[1])));
+                commandSender.sendMiniMessage(Config.UNKNOWN_PLAYER, TagResolver.resolver(Placeholder.unparsed("player", args[1])));
                 return true;
             }
             new BukkitRunnable() {
@@ -106,9 +106,9 @@ public class CommandFlagList extends SubCommand {
             Component message = null;
             while (resultSet.next()) {
                 if (message == null) {
-                    message = miniMessage.deserialize(Config.PLAYER_FLAGS_HEADER, TemplateResolver.templates(List.of(
-                            Template.template("player", targetName),
-                            Template.template("flag_amount", String.valueOf(resultSet.getString("total_flags")))
+                    message = miniMessage.deserialize(Config.PLAYER_FLAGS_HEADER, TagResolver.resolver(List.of(
+                            Placeholder.unparsed("player", targetName),
+                            Placeholder.unparsed("flag_amount", String.valueOf(resultSet.getString("total_flags")))
                     )));
                 }
                 long expireTime = TimeUnit.SECONDS.toMinutes(resultSet.getInt("expire_time"));
@@ -117,15 +117,15 @@ public class CommandFlagList extends SubCommand {
                 int convertedExpireTime = (int) expireTime - (int) currentTime;
                 int convertedFlaggedTime = (int) currentTime - (int) timeFlagged;
                 String id = String.valueOf(resultSet.getInt("id"));
-                List<Template> templates = List.of(Template.template("player", targetPlayer.getName()),
-                        Template.template("flag", resultSet.getString("reason")),
-                        Template.template("staff", resultSet.getString("flagged_by")),
-                        Template.template("flag_length", resultSet.getString("flag_length")),
-                        Template.template("reason", resultSet.getString("reason")),
-                        Template.template("flag_time", Utilities.convertTime(convertedFlaggedTime)),
-                        Template.template("expire_time", Utilities.convertTime(convertedExpireTime)),
-                        Template.template("nl", "\n"),
-                        Template.template("id", id)
+                TagResolver templates = TagResolver.resolver(Placeholder.unparsed("player", targetPlayer.getName()),
+                        Placeholder.unparsed("flag", resultSet.getString("reason")),
+                        Placeholder.unparsed("staff", resultSet.getString("flagged_by")),
+                        Placeholder.unparsed("flag_length", resultSet.getString("flag_length")),
+                        Placeholder.unparsed("reason", resultSet.getString("reason")),
+                        Placeholder.unparsed("flag_time", Utilities.convertTime(convertedFlaggedTime)),
+                        Placeholder.unparsed("expire_time", Utilities.convertTime(convertedExpireTime)),
+                        Placeholder.unparsed("nl", "\n"),
+                        Placeholder.unparsed("id", id)
                 );
                 String str = String.join("\n", body)
                         .replaceAll("<remove_button>", "<white>" +
@@ -138,10 +138,10 @@ public class CommandFlagList extends SubCommand {
                     str = str.replaceAll("<active>", Config.ACTIVE_FLAGS);
                 str = "\n" + str;
                 Logger.info(str);
-                message = message.append(miniMessage.deserialize(str, TemplateResolver.templates(templates)));
+                message = message.append(miniMessage.deserialize(str, TagResolver.resolver(templates)));
             }
             if (message == null) {
-                commandSender.sendMiniMessage(Config.NO_FLAGS_FOUND, List.of(Template.template("target", targetName)));
+                commandSender.sendMiniMessage(Config.NO_FLAGS_FOUND, TagResolver.resolver(Placeholder.unparsed("target", targetName)));
             } else
                 commandSender.sendMessage(message);
         } catch (SQLException exception) {

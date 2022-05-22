@@ -9,8 +9,8 @@ import com.liteflags.data.maps.MapCache;
 import com.liteflags.util.Utilities;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.Template;
-import net.kyori.adventure.text.minimessage.template.TemplateResolver;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -32,13 +32,13 @@ public class CommandFlagPlayer extends SubCommand {
 
         OfflinePlayer target = Bukkit.getServer().getOfflinePlayerIfCached(args[0]);
         if (target == null) {
-            commandSender.sendMiniMessage(Config.UNKNOWN_PLAYER, List.of(Template.template("player", args[2])));
+            commandSender.sendMiniMessage(Config.UNKNOWN_PLAYER, TagResolver.resolver(Placeholder.unparsed("player", args[2])));
             return true;
         }
 
         if (Config.MAX_ACTIVE_FLAGS >= 0 && Methods.getTotalActiveFlags(target) >= Config.MAX_ACTIVE_FLAGS) {
-            commandSender.sendMiniMessage(Config.ACTIVE_FLAGS_LIMIT, List.of(
-                    Template.template("player", target.getName() == null ? target.getUniqueId().toString() : target.getName())
+            commandSender.sendMiniMessage(Config.ACTIVE_FLAGS_LIMIT, TagResolver.resolver(
+                    Placeholder.unparsed("player", target.getName() == null ? target.getUniqueId().toString() : target.getName())
             ));
             return true;
         }
@@ -70,11 +70,11 @@ public class CommandFlagPlayer extends SubCommand {
             MapCache.activeFlags.add(target.getName());
         }
 
-        Component message = MiniMessage.miniMessage().deserialize(Config.FLAGGED_PLAYER, TemplateResolver.templates(List.of(
-                Template.template("staff", sender.getName()),
-                Template.template("player", target.getName() == null ? target.getUniqueId().toString() : target.getName()),
-                Template.template("flag_length", "Permanent"),
-                Template.template("reason", reason)
+        Component message = MiniMessage.miniMessage().deserialize(Config.FLAGGED_PLAYER, TagResolver.resolver(List.of(
+                Placeholder.unparsed("staff", sender.getName()),
+                Placeholder.unparsed("player", target.getName() == null ? target.getUniqueId().toString() : target.getName()),
+                Placeholder.unparsed("flag_length", "Permanent"),
+                Placeholder.unparsed("reason", reason)
         )));
 
         Bukkit.getOnlinePlayers().stream()
@@ -84,7 +84,7 @@ public class CommandFlagPlayer extends SubCommand {
 
     private void tempFlag(CommandSender commandSender, String[] args, OfflinePlayer target) {
         if (args[1].length() < 2) {
-            commandSender.sendMiniMessage(Config.INVALID_TIME_ARGUMENT, List.of(Template.template("arg", args[1])));
+            commandSender.sendMiniMessage(Config.INVALID_TIME_ARGUMENT, TagResolver.resolver(Placeholder.unparsed("arg", args[1])));
             return;
         }
 
@@ -92,7 +92,7 @@ public class CommandFlagPlayer extends SubCommand {
         String letter = args[1].substring(args[1].length() - 1);
         String[] validTimes = new String[]{"d", "h", "m"};
         if (!time.matches("[1-9][0-9]{0,8}") || !Arrays.asList(validTimes).contains(letter)) {
-            commandSender.sendMiniMessage(Config.INVALID_TIME_ARGUMENT, List.of(Template.template("arg", args[1])));
+            commandSender.sendMiniMessage(Config.INVALID_TIME_ARGUMENT, TagResolver.resolver(Placeholder.unparsed("arg", args[1])));
             return;
         }
 
@@ -113,11 +113,11 @@ public class CommandFlagPlayer extends SubCommand {
             MapCache.activeFlags.add(target.getName());
         }
 
-        Component message = MiniMessage.miniMessage().deserialize(Config.FLAGGED_PLAYER, TemplateResolver.templates(List.of(
-                Template.template("staff", commandSender.getName()),
-                Template.template("player", target.getName() == null ? target.getUniqueId().toString() : target.getName()),
-                Template.template("flag_length", Utilities.convertTime(timeInMin)),
-                Template.template("reason", reason)
+        Component message = MiniMessage.miniMessage().deserialize(Config.FLAGGED_PLAYER, TagResolver.resolver(List.of(
+                Placeholder.unparsed("staff", commandSender.getName()),
+                Placeholder.unparsed("player", target.getName() == null ? target.getUniqueId().toString() : target.getName()),
+                Placeholder.unparsed("flag_length", Utilities.convertTime(timeInMin)),
+                Placeholder.unparsed("reason", reason)
         )));
 
         Bukkit.getOnlinePlayers().stream()

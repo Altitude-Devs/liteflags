@@ -3,14 +3,14 @@ package com.liteflags.auth;
 import com.liteflags.LiteFlags;
 import com.liteflags.config.Config;
 import com.liteflags.data.maps.MapCache;
-import com.liteflags.util.Utilities;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import net.kyori.adventure.text.minimessage.Template;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -36,8 +36,8 @@ public class AuthTimer<taskID> {
                         final String code = MapCache.reauthedPlayers.get(uuid);
                         if (code == null)
                             return;
-                        player.sendMiniMessage(Config.AUTHENTICATE, List.of(
-                                Template.template("code", code)));
+                        player.sendMiniMessage(Config.AUTHENTICATE, TagResolver.resolver(
+                                Placeholder.unparsed("code", code)));
                         Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Config.AUTH_MESSAGE_COMMAND
                                 .replaceAll("<player>", player.getName())
                                 .replaceAll("<code>", code));

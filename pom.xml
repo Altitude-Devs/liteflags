@@ -35,16 +35,15 @@
 
     <repositories>
         <repository>
-            <id>papermc</id>
-            <url>https://papermc.io/repo/repository/maven-public/</url>
+            <id>Alttd-Nexus</id>
+            <url>https://repo.destro.xyz/snapshots</url>
         </repository>
     </repositories>
     <dependencies>
-        <dependency>
-            <groupId>io.papermc.paper</groupId>
-            <artifactId>paper-api</artifactId>
-            <version>1.17.1-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
+        <dependency><!-- Galaxy -->
+            <groupId>com.alttd</groupId>
+            <artifactId>Galaxy-API</artifactId>
+            <version>1.18.2-R0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
     
