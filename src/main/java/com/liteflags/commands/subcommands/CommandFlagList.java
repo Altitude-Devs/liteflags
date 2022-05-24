@@ -37,7 +37,7 @@ public class CommandFlagList extends SubCommand {
                         return;
                     }
                     commandSender.sendMiniMessage(Config.ALERT_ACTIVE_FLAGS, TagResolver.resolver(
-                            Placeholder.unparsed("player", player.getName() == null ? playerName : player.getName()),
+                            Placeholder.parsed("player", player.getName() == null ? playerName : player.getName()),
                             Placeholder.unparsed("total_act_flags", String.valueOf( Methods.getTotalActiveFlags(player))),
                             Placeholder.unparsed("console_flags", String.valueOf(Methods.consoleFlags)),
                             Placeholder.unparsed("staff_flags", String.valueOf(Methods.staffFlags))
