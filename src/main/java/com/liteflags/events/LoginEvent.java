@@ -37,7 +37,7 @@ public class LoginEvent implements Listener {
                 MapCache.activeFlags.add(player.getName());
 
                 Component message = MiniMessage.miniMessage().deserialize(Config.ALERT_ACTIVE_FLAGS, TagResolver.resolver(List.of(
-                        Placeholder.unparsed("player", player.getName()),
+                        Placeholder.parsed("player", player.getName()),
                         Placeholder.unparsed("total_act_flags", String.valueOf(Methods.getTotalActiveFlags(player))),
                         Placeholder.unparsed("console_flags", String.valueOf(Methods.consoleFlags)),
                         Placeholder.unparsed("staff_flags", String.valueOf(Methods.staffFlags))
