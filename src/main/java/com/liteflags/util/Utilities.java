@@ -9,8 +9,8 @@ public class Utilities {
         int minutes = (int) (TimeUnit.MINUTES.toMinutes(time) - TimeUnit.HOURS.toMinutes(hours) - TimeUnit.DAYS.toMinutes(days));
 
         String timeString = formatTime(days, " day");
-        timeString += (hours == 0 ? "" : ", ") + formatTime(hours, " hour");
-        timeString += (minutes == 0 ? "" : ", ") + formatTime(minutes, " minute");
+        timeString += (timeString.length() == 0 ? "" : (hours == 0 ? "" : ", ")) + formatTime(hours, " hour");
+        timeString += (timeString.length() == 0 ? "" : (minutes == 0 ? "" : ", ")) + formatTime(minutes, " minute");
 
         if (timeString.length() == 0) timeString = "0 minutes";
 
