@@ -53,9 +53,9 @@ public class CommandFlagRemove extends SubCommand {
 //                    Placeholder.unparsed("id", String.valueOf(id))
 //            ));
             commandSender.sendMiniMessage(Config.FLAG_CONFIRM, TagResolver.resolver(
-                    Placeholder.unparsed("flag_reason", flagReason == null ? "Unknown" : flagReason),
-                    Placeholder.unparsed("target_name", name == null ? target.getUniqueId().toString() : name),
-                    Placeholder.unparsed("id", String.valueOf(id))
+                    Placeholder.parsed("flag_reason", flagReason == null ? "Unknown" : flagReason),
+                    Placeholder.parsed("target_name", name == null ? target.getUniqueId().toString() : name),
+                    Placeholder.parsed("id", String.valueOf(id))
             ));
         }
         return true;
