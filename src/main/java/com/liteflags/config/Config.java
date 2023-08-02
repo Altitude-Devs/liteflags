@@ -51,6 +51,7 @@ public final class Config extends AbstractConfig {
     public static String FLAG_CONFIRM = "<white>Are you sure you want to remove the flag <flag_reason> from " +
             "<yellow><target_name></yellow>'s flag history? " +
             "<hover:show_text:\"Click to confirm\"><click:run_command:\"/flag remove <id> <target_name> -c\">[<green>Confirm</green>]</click></hover></white>";
+    public static String VARIABLE_LENGTH_NOT_ALLOWED = "<red>You do not have permission to set a flag at a custom length</red>";
     private static void loadMessages() {
         ALERT_ACTIVE_FLAGS = config.getString("messages.alert-active-flags", ALERT_ACTIVE_FLAGS);
         PLAYER_FLAGS_HEADER = config.getString("messages.player-flags-header", PLAYER_FLAGS_HEADER);
@@ -79,6 +80,7 @@ public final class Config extends AbstractConfig {
         NO_FLAG_FOUND = config.getString("messages.no-flag-found", NO_FLAG_FOUND);
         INVALID_TIME_ARGUMENT = config.getString("messages.invalid-time-argument", INVALID_TIME_ARGUMENT);
         FLAG_CONFIRM = config.getString("messages.flag-confirm", FLAG_CONFIRM);
+        VARIABLE_LENGTH_NOT_ALLOWED = config.getString("messages.variable-length-not-allowed", VARIABLE_LENGTH_NOT_ALLOWED);
     }
 
     public static String HELP_MESSAGE_WRAPPER = "<gold>LiteFlags help:\n<commands></gold>";
@@ -121,6 +123,7 @@ public final class Config extends AbstractConfig {
     public static String TIME_FORMAT = "Days";
     public static String AUTH_MESSAGE_COMMAND = "cmi titlemessage <player> -keep:80 &7You need to authenticate! <nl>&7Type &6<code> &7in chat to authenticate. (CaSe SeNsiTiVe)";
     public static String AUTH_SUCCESS_COMMAND = "lp user <player> permission settemp <permission> true <expire_time>";
+    public static int DEFAULT_FLAG_LENGTH_DAYS = 30;
     private static void loadSettings() {
         MAX_ACTIVE_FLAGS = config.getInt("settings.max-active-flags", MAX_ACTIVE_FLAGS);
         MAX_FLAGS_LISTED = config.getInt("settings.max-flags-listed", MAX_FLAGS_LISTED);
@@ -130,6 +133,7 @@ public final class Config extends AbstractConfig {
         TIME_FORMAT = config.getString("settings.time-format", TIME_FORMAT);
         AUTH_MESSAGE_COMMAND = config.getString("settings.auth-message-command", AUTH_MESSAGE_COMMAND);
         AUTH_SUCCESS_COMMAND = config.getString("settings.auth-success-command", AUTH_SUCCESS_COMMAND);
+        DEFAULT_FLAG_LENGTH_DAYS = config.getInt("settings.default-flag-length-days", DEFAULT_FLAG_LENGTH_DAYS);
     }
 
 }

@@ -17,9 +17,12 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class CommandFlagPlayer extends SubCommand {
@@ -44,6 +47,10 @@ public class CommandFlagPlayer extends SubCommand {
         }
 
         if (args[1].equals("*")) {
+            if (!commandSender.hasPermission(getPermission() + ".variable-time")) {
+                commandSender.sendMiniMessage(Config.VARIABLE_LENGTH_NOT_ALLOWED, null);
+                return true;
+            }
             permFlag(commandSender, args, target);
         } else {
             tempFlag(commandSender, args, target);
@@ -83,29 +90,28 @@ public class CommandFlagPlayer extends SubCommand {
     }
 
     private void tempFlag(CommandSender commandSender, String[] args, OfflinePlayer target) {
-        if (args[1].length() < 2) {
-            commandSender.sendMiniMessage(Config.INVALID_TIME_ARGUMENT, TagResolver.resolver(Placeholder.unparsed("arg", args[1])));
+        Optional<Duration> flagDurationIfExists = getFlagDurationIfExists(args[1]);
+        Instant expireTime = Instant.now();
+        int firstArg = 2;
+        Duration flagDuration;
+        if (flagDurationIfExists.isPresent() && !commandSender.hasPermission(getPermission() + ".variable-time")) {
+            commandSender.sendMiniMessage(Config.VARIABLE_LENGTH_NOT_ALLOWED, null);
             return;
         }
-
-        String time = args[1].substring(0, args[1].length() - 1);
-        String letter = args[1].substring(args[1].length() - 1);
-        String[] validTimes = new String[]{"d", "h", "m"};
-        if (!time.matches("[1-9][0-9]{0,8}") || !Arrays.asList(validTimes).contains(letter)) {
-            commandSender.sendMiniMessage(Config.INVALID_TIME_ARGUMENT, TagResolver.resolver(Placeholder.unparsed("arg", args[1])));
-            return;
+        if (flagDurationIfExists.isEmpty()) {
+            firstArg = 1;
+            flagDuration = Duration.ofDays(Config.DEFAULT_FLAG_LENGTH_DAYS);
+        } else {
+            flagDuration = flagDurationIfExists.get();
         }
+        expireTime = expireTime.plusSeconds(flagDuration.toSeconds());
+        String reason = String.join(" ", Arrays.copyOfRange(args, firstArg, args.length));
 
-        int number = Integer.parseInt(time);
-        int timeInMin = this.convertTimeToMinutes(number, letter);
-        long currentTime = TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis());
-        int conTime = (int) currentTime + timeInMin;
-        String reason = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
-
+        Instant finalExpireTime = expireTime;
         new BukkitRunnable() {
             @Override
             public void run() {
-                Database.addFlag(target.getUniqueId(), (int) TimeUnit.MINUTES.toSeconds(conTime), reason, commandSender.getName(), Utilities.convertTime(timeInMin));
+                Database.addFlag(target.getUniqueId(), finalExpireTime, reason, commandSender.getName(), Utilities.convertTime(flagDuration));
             }
         }.runTask(LiteFlags.getInstance());
 
@@ -116,7 +122,7 @@ public class CommandFlagPlayer extends SubCommand {
         Component message = MiniMessage.miniMessage().deserialize(Config.FLAGGED_PLAYER, TagResolver.resolver(List.of(
                 Placeholder.unparsed("staff", commandSender.getName()),
                 Placeholder.unparsed("player", target.getName() == null ? target.getUniqueId().toString() : target.getName()),
-                Placeholder.unparsed("flag_length", Utilities.convertTime(timeInMin)),
+                Placeholder.unparsed("flag_length", Utilities.convertTime(flagDuration)),
                 Placeholder.unparsed("reason", reason)
         )));
 
@@ -125,11 +131,36 @@ public class CommandFlagPlayer extends SubCommand {
                 .forEach(player -> player.sendMessage(message));
     }
 
-    public int convertTimeToMinutes(int number, String dhm) {
-        if (dhm.equalsIgnoreCase("d")) {
-            return 1440 * number;
-        } else {
-            return dhm.equalsIgnoreCase("h") ? 60 * number : number;
+    Optional<Duration> getFlagDurationIfExists(String timeArg) {
+        if (timeArg.length() < 2) {
+            return Optional.empty();
+        }
+
+        String time = timeArg.substring(0, timeArg.length() - 1);
+        String letter = timeArg.substring(timeArg.length() - 1);
+        String[] validTimes = new String[]{"d", "h", "m"};
+        if (!time.matches("[1-9][0-9]{0,8}") || !Arrays.asList(validTimes).contains(letter)) {
+            return Optional.empty();
+        }
+
+        int number = Integer.parseInt(time);
+        return convertTimeToExpireTime(number, letter);
+    }
+
+    public Optional<Duration> convertTimeToExpireTime(int number, String dhm) {
+        switch (dhm.toLowerCase()) {
+            case "d" -> {
+                return Optional.of(Duration.ofDays(number));
+            }
+            case "h" -> {
+                return Optional.of(Duration.ofHours(number));
+            }
+            case "m" -> {
+                return Optional.of(Duration.ofMinutes(number));
+            }
+            default -> {
+                return Optional.empty();
+            }
         }
     }
 
@@ -141,7 +172,7 @@ public class CommandFlagPlayer extends SubCommand {
     @Override
     public List<String> getTabComplete(CommandSender commandSender, String[] args) {
         ArrayList<String> res = new ArrayList<>();
-        if (args.length == 2)
+        if (args.length == 2 && commandSender.hasPermission(getPermission() + ".variable-time"))
             for (int i = 1; i <= 9; i++) {
                 if (args[1].isEmpty() || args[1].startsWith(String.valueOf(i)))
                     res.add(i + "d");

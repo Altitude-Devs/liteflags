@@ -20,6 +20,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -83,7 +85,7 @@ public class CommandFlagList extends SubCommand {
             res.addAll(Bukkit.getOnlinePlayers().stream()
                     .map(Player::getName)
                     .filter(name -> args[1].isEmpty() || name.toLowerCase().startsWith(args[1].toLowerCase()))
-                    .collect(Collectors.toList()));
+                    .toList());
         return res;
     }
 
@@ -111,11 +113,17 @@ public class CommandFlagList extends SubCommand {
                             Placeholder.unparsed("flag_amount", String.valueOf(resultSet.getString("total_flags")))
                     )));
                 }
-                long expireTime = TimeUnit.SECONDS.toMinutes(resultSet.getInt("expire_time"));
-                long timeFlagged = TimeUnit.SECONDS.toMinutes(resultSet.getInt("time_flagged"));
-                long currentTime = TimeUnit.SECONDS.toMinutes(System.currentTimeMillis() / 1000L);
-                int convertedExpireTime = (int) expireTime - (int) currentTime;
-                int convertedFlaggedTime = (int) currentTime - (int) timeFlagged;
+                int dbExpireTime = resultSet.getInt("expire_time");
+                Instant expireTime = dbExpireTime == 0 ? Instant.MIN : Instant.ofEpochSecond(dbExpireTime);
+//                long expireTime = TimeUnit.SECONDS.toMinutes(resultSet.getInt("expire_time"));
+                Instant timeFlagged = Instant.ofEpochSecond(resultSet.getInt("time_flagged"));
+//                long timeFlagged = TimeUnit.SECONDS.toMinutes(resultSet.getInt("time_flagged"));
+                Instant currentTime = Instant.now();
+//                long currentTime = TimeUnit.SECONDS.toMinutes(System.currentTimeMillis() / 1000L);
+                Duration convertedExpireTime = Duration.between(currentTime, expireTime);
+//                int convertedExpireTime = (int) expireTime - (int) currentTime;
+                Duration convertedFlaggedTime = Duration.between(currentTime, timeFlagged);
+//                int convertedFlaggedTime = (int) currentTime - (int) timeFlagged;
                 String id = String.valueOf(resultSet.getInt("id"));
                 TagResolver templates = TagResolver.resolver(Placeholder.unparsed("player", targetPlayer.getName()),
                         Placeholder.unparsed("flag", resultSet.getString("reason")),
@@ -132,7 +140,7 @@ public class CommandFlagList extends SubCommand {
                                 "<hover:show_text:\"Click to remove this flag\">" +
                                 "<click:run_command:/flag remove " + id + " " + targetPlayer.getName() + ">" +
                                 "[<red>✖</red>]</click></hover></white>");
-                if (convertedExpireTime < 0 && expireTime != 0L) //Not active
+                if (convertedExpireTime.isNegative() && !expireTime.equals(Instant.MIN)) //Not active
                     str = str.replaceAll("<active>", Config.EXPIRED_FLAGS);
                 else //Active
                     str = str.replaceAll("<active>", Config.ACTIVE_FLAGS);

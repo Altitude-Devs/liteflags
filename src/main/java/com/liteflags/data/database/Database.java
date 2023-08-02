@@ -6,7 +6,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Instant;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class Database {
     public static void createTables() {
@@ -32,6 +34,26 @@ public class Database {
 
             statement.setString(1, uuid.toString());
             statement.setLong(2, expireTime);
+            statement.setString(3, reason);
+            statement.setString(4, flaggedBy);
+            statement.setInt(5, timeFlagged);
+            statement.setString(6, flagLength);
+            statement.execute();
+        } catch (SQLException var21) {
+            var21.printStackTrace();
+        }
+
+    }
+
+    public static void addFlag(UUID uuid, Instant expireTime, String reason, String flaggedBy, String flagLength) {
+        int timeFlagged = (int) TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
+        String sql = "INSERT INTO player_flags (uuid, expire_time, reason, flagged_by, time_flagged, flag_length) VALUES (?, ?, ?, ?, ?, ?)";
+
+        try {
+            PreparedStatement statement = DatabaseConnection.getConnection().prepareStatement(sql);
+
+            statement.setString(1, uuid.toString());
+            statement.setLong(2, expireTime.getEpochSecond());
             statement.setString(3, reason);
             statement.setString(4, flaggedBy);
             statement.setInt(5, timeFlagged);
