@@ -15,8 +15,17 @@ public class Authentication {
         StringBuilder salt = new StringBuilder();
         Random rnd = new Random();
 
+        boolean hasCaps = false;
+
         while (salt.length() < 6) {
             int index = (int) (rnd.nextFloat() * (float) randChars.length());
+            if (index < 26) { //Hot fix for too many caps and the chat filter blocking it
+                if (hasCaps) {
+                    index += 26;
+                } else {
+                    hasCaps = true;
+                }
+            }
             salt.append(randChars.charAt(index));
         }
 
